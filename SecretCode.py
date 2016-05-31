@@ -1,32 +1,32 @@
-from socket import socket, AF_INET, SOCK_STREAM
+from socket import socket, AF_INET, SOCK_STREAM, error
 from struct import unpack, pack
 
 BUF_SIZE = 4096
 DECODE_CODE = '!I'
 OPEN = 1
 CLOSED = 0
+SERVER_IP = 'unimate.cs.washington.edu'
+SERVER_PORT = 48102
 
-class SecretCode:
-    def __init__(self, srv_ip, srv_port):
-        """
-        :param srv_ip: the ip to connect to (should be unimate most likely)
-        :param srv_port: the port to connect to
-        :return:
-        """
-        self.srv_socket = socket(AF_INET, SOCK_STREAM)
-        self.srv_socket.connect((srv_ip, srv_port))
+def get_secret_code():
+    secret_code = 0
+    while secret_code is 0:
+        secret_code = recv_secret_code()
 
-    def recv_secret_code(self):
-        """
-        Waits to recieve the secret code (will block)
-        :return:
-        """
-        print('Waiting to receive secret code...')
-        recv_data = self.srv_socket.recv(BUF_SIZE)
-        secret_code, = unpack(DECODE_CODE, recv_data)
-        print(secret_code)
-        return secret_code
+    return str(secret_code)
 
-    def send_open_message(self):
-        data = pack(DECODE_CODE, OPEN)
-        self.srv_socket.sendall(data)
+def recv_secret_code():
+    """
+    Waits to recieve the secret code (will block)
+    :return:
+    """
+    try:
+        srv_socket = socket(AF_INET, SOCK_STREAM)
+        srv_socket.connect((SERVER_IP, SERVER_PORT))
+        recv_data = srv_socket.recv(BUF_SIZE)
+    except error:
+        return 0
+
+    secret_code = unpack(DECODE_CODE, recv_data)
+    return secret_code
+

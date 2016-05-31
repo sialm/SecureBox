@@ -1,22 +1,23 @@
 #!/usr/bin/env python
 from BoxController import BoxController
+import SecretCode
+
 
 class StateMachine():
     def __init__(self):
         self.box_controller = BoxController()
-        self.secret_code_receiver = SecretCode('unimate.cs.washington.edu', 48102)
 
     def log(self, message):
         print(message)
 
     def run(self):
         try:
+            self.box_controller.open_box()
             while True:
-                secret_code = self.get_next_secret_code()
+                secret_code = SecretCode.get_secret_code()
                 self.box_controller.close_box()
                 self.wait_for_secret_code_match(secret_code)
                 self.box_controller.open_box()
-                self.send_opened_message()
         except KeyboardInterrupt:
             self.log('Closing')
             self.box_controller.tear_down()
@@ -28,34 +29,12 @@ class StateMachine():
         :return:
         '''
         while True:
-            print()
             user_code = raw_input()
             if user_code == secret_code:
                 print('Secret code matched')
                 return
             else:
                 self.log('Secret code did not match')
-
-    def get_next_secret_code(self):
-        '''
-        Blocking IO call to server to get the next secret code
-        :return:
-        '''
-        # TODO blocking IO call to network for next secret
-        self.log('Waiting for next secret')
-        secret_code = self.secret_code_receiver.recv_secret_code()
-        self.log('secret code : ' + secret_code)
-        return secret_code
-
-    def send_opened_message(self):
-        '''
-        Sends a packet to the server indicating that the customer has opened the box and probably retrieved their snack
-        :return:
-        '''
-        # TODO send newtwork call indicating opened state
-        self.log('Sending opened message')
-        raw_input('Press enter.')
-        self.secret_code_receiver.send_open_message()
 
 
 state_machine = StateMachine()
