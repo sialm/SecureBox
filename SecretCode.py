@@ -5,14 +5,17 @@ BUF_SIZE = 4096
 DECODE_CODE = '!I'
 OPEN = 1
 CLOSED = 0
-SERVER_IP = 'unimate.cs.washington.edu'
+SERVER_IP = '140.142.30.164' #'unimate.cs.washington.edu'
 SERVER_PORT = 48102
 
 def get_secret_code():
     secret_code = 0
     while secret_code is 0:
+        print('getting code')
         secret_code = recv_secret_code()
 
+    print('secret : ' + str(secret_code))
+    secret_code = secret_code[0]
     return str(secret_code)
 
 def recv_secret_code():
@@ -21,6 +24,7 @@ def recv_secret_code():
     :return:
     """
     try:
+        print('trying to connect')
         srv_socket = socket(AF_INET, SOCK_STREAM)
         srv_socket.connect((SERVER_IP, SERVER_PORT))
         recv_data = srv_socket.recv(BUF_SIZE)

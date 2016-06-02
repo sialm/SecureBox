@@ -14,6 +14,7 @@ class StateMachine():
         try:
             self.box_controller.open_box()
             while True:
+                print('looping')
                 secret_code = SecretCode.get_secret_code()
                 self.box_controller.close_box()
                 self.wait_for_secret_code_match(secret_code)
