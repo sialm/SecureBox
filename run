@@ -12,12 +12,12 @@ class StateMachine():
 
     def run(self):
         try:
-            self.box_controller.open_box()
             while True:
+                self.box_controller.open_box()
+                blocking_call_for_time_delay = raw_input('wait for user to press enter')
                 secret_code = SecretCode.get_secret_code()
                 self.box_controller.close_box()
                 self.wait_for_secret_code_match(secret_code)
-                self.box_controller.open_box()
         except KeyboardInterrupt:
             self.log('Closing')
             self.box_controller.tear_down()
